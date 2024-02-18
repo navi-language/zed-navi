@@ -66,65 +66,73 @@
 (line_comment) @comment
 (block_comment) @comment
 
-"(" @punctuation.bracket
-")" @punctuation.bracket
-"[" @punctuation.bracket
-"]" @punctuation.bracket
-"{" @punctuation.bracket
-"}" @punctuation.bracket
+[
+  "("
+  ")"
+  "["
+  "]"
+  "{"
+  "}"
+] @punctuation.bracket
 
-(type_arguments
-  "<" @punctuation.bracket
-  ">" @punctuation.bracket)
+(type_arguments [
+  "<"
+  ">"
+] @punctuation.bracket)
 (type_parameters
   "<" @punctuation.bracket
   ">" @punctuation.bracket)
 
-"::" @punctuation.delimiter
-":" @punctuation.delimiter
-"." @punctuation.delimiter
-"," @punctuation.delimiter
-";" @punctuation.delimiter
+[
+  "::"
+  ":"
+  "."
+  ","
+  ";"
+] @punctuation.delimiter
 
 (parameter (identifier) @variable.parameter)
 
 (lifetime (identifier) @label)
 
-"as" @keyword
-"break" @keyword
-"case" @keyword
-"catch" @keyword
-"const" @keyword
-"continue" @keyword
-"default" @keyword
-"defer" @keyword
-"do" @keyword
-"else" @keyword
-"enum" @keyword
-"finally" @keyword
-"fn" @keyword
-"for" @keyword
-"if" @keyword
-"impl" @keyword
-"in" @keyword
-"interface" @keyword
-"let" @keyword
-"loop" @keyword
-"pub" @keyword
-"return" @keyword
-"select" @keyword
-"spawn" @keyword
-"struct" @keyword
-"switch" @keyword
-"throw" @keyword
-"throws" @keyword
-"try" @keyword
-"type" @keyword
-"use" @keyword
-"while" @keyword
-"assert" @keyword
-"assert_eq" @keyword
-"assert_ne" @keyword
+[
+  "as"
+  "break"
+  "case"
+  "catch"
+  "const"
+  "continue"
+  "default"
+  "defer"
+  "do"
+  "else"
+  "enum"
+  "finally"
+  "fn"
+  "for"
+  "if"
+  "impl"
+  "in"
+  "interface"
+  "let"
+  "loop"
+  "pub"
+  "return"
+  "select"
+  "spawn"
+  "struct"
+  "switch"
+  "throw"
+  "throws"
+  "try"
+  "type"
+  "use"
+  "while"
+  "assert"
+  "assert_eq"
+  "assert_ne"
+] @keyword
+
 (use_list (self) @keyword)
 (scoped_use_list (self) @keyword)
 (scoped_identifier (self) @keyword)
@@ -145,8 +153,10 @@
 (attribute_item) @attribute
 (inner_attribute_item) @attribute
 
-"*" @operator
-"&" @operator
-"'" @operator
-"?" @operator
-"!" @operator
+[
+  "*"
+  "&"
+  "'"
+  "?"
+  "!"
+] @operator
