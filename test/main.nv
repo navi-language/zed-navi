@@ -1,0 +1,10 @@
+use std.io;
+
+struct User {
+    name: string,
+}
+
+fn main() {
+    let user = User { name: "Jason Lee" };
+    io.println("Hello, " + user.name);
+}
