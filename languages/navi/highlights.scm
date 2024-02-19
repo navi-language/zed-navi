@@ -79,6 +79,7 @@
   "<"
   ">"
 ] @punctuation.bracket)
+
 (type_parameters
   "<" @punctuation.bracket
   ">" @punctuation.bracket)
@@ -131,6 +132,8 @@
   "assert"
   "assert_eq"
   "assert_ne"
+  "test"
+  "bench"
 ] @keyword
 
 (use_list (self) @keyword)
