@@ -72,6 +72,7 @@
   "["
   "]"
   "{"
+  "${"
   "}"
 ] @punctuation.bracket
 
@@ -98,6 +99,10 @@
 
 [
   "as"
+  "assert"
+  "assert_eq"
+  "assert_ne"
+  "bench"
   "break"
   "case"
   "catch"
@@ -123,17 +128,14 @@
   "spawn"
   "struct"
   "switch"
+  "test"
   "throw"
   "throws"
+  "try!"
   "try"
   "type"
   "use"
   "while"
-  "assert"
-  "assert_eq"
-  "assert_ne"
-  "test"
-  "bench"
 ] @keyword
 
 (use_list (self) @keyword)
