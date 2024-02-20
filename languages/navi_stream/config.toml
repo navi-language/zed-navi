@@ -1,5 +1,5 @@
 name = "Navi Stream"
-grammar = "navi-stream"
+grammar = "navi_stream"
 path_suffixes = ["nvs"]
 line_comments = ["// ", "/// "]
 autoclose_before = ";:.,=}])>"
