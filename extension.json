@@ -1,6 +1,6 @@
 {
   "name": "Navi",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "authors": ["Jason Lee <huacnlee@gmail.com>"],
   "description": "Navi language support for Zed",
   "repository": "https://github.com/navi-language/zed-navi"

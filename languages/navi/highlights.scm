@@ -144,10 +144,16 @@
 
 (self) @variable.builtin
 
-(char_literal) @string
-(string_literal) @string
-(raw_string_literal) @string
-(string_template) @string
+[
+    (char_literal)
+    (string_literal)
+    (raw_string_literal)
+    (string_template)
+] @string
+
+(string_template_substitution
+    "${" @punctuation.special
+     "}" @punctuation.special) @embedded
 
 (boolean_literal) @constant.builtin
 (integer_literal) @constant.builtin
