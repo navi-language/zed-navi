@@ -5,7 +5,9 @@ This extension provides language support for the [Navi](https://navi-lang.org).
 ## Features
 
 - Syntax highlighting.
+- Outline view.
 - LSP support [TODO].
+- Formatting [TODO].
 
 ## Screenshot
 
