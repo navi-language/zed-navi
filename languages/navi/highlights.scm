@@ -42,6 +42,7 @@
   function: (scoped_identifier
     "."
     name: (identifier) @function))
+(keyword_argument key: (identifier) @variable.parameter)
 
 (generic_function
   function: (identifier) @function)
@@ -76,14 +77,17 @@
   "}"
 ] @punctuation.bracket
 
+(closure_type [
+    "|"
+] @punctuation.bracket)
+(closure_parameters [
+  "|"
+] @punctuation.bracket)
+
 (type_arguments [
   "<"
   ">"
 ] @punctuation.bracket)
-
-(type_parameters
-  "<" @punctuation.bracket
-  ">" @punctuation.bracket)
 
 [
   "::"

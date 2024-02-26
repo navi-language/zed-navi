@@ -43,6 +43,8 @@
     "."
     name: (identifier) @function))
 
+(keyword_argument key: (identifier) @variable.parameter)
+
 (generic_function
   function: (identifier) @function)
 (generic_function
@@ -63,7 +65,7 @@
 (primitive_type) @type.builtin
 (field_identifier) @property
 
-(i18nvariable) @constant
+(i18n_key) @constant
 
 (line_comment) @comment
 (block_comment) @comment
@@ -140,6 +142,7 @@
   "while"
   "meta"
   "param"
+  "export"
 ] @keyword
 
 (use_list (self) @keyword)
