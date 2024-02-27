@@ -12,6 +12,5 @@ jobs:
         with:
           extension-name: navi
           push-to: huacnlee/zed-extensions
-          create-pullrequest: false
         env:
           COMMITTER_TOKEN: ${{ secrets.COMMITTER_TOKEN }}
