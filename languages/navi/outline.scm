@@ -18,7 +18,7 @@
 
 (impl_item
     "impl" @context
-    trait: (_)? @name
+    interface: (_)? @name
     "for"? @context
     type: (_) @name) @item
 
@@ -44,4 +44,12 @@
 (const_item
     (visibility_modifier)? @context
     "const" @context
+    name: (_) @name) @item
+
+(test_item
+    "test" @context
+    name: (_) @name) @item
+
+(bench_item
+    "bench" @context
     name: (_) @name) @item
