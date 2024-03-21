@@ -1,144 +1,112 @@
-use anyhow::{anyhow, Context, Result};
-use async_compression::futures::bufread::GzipDecoder;
-use async_tar::Archive;
-use futures::executor::block_on;
-use serde_derive::Serialize;
-use smol::fs;
-use smol::io::BufReader;
-use smol::stream::StreamExt;
-use std::env::consts::ARCH;
-use std::path::PathBuf;
-
-use plugin::prelude::*;
-use serde::Deserialize;
-use util::github::latest_github_release;
-use util::{async_maybe, http, ResultExt};
+use std::fs;
+use zed_extension_api::{self as zed, Result};
 
 static NAVI_SERVER_BIN_NAME: &'static str = "navi-lsp-server";
 
-#[derive(Debug, Deserialize, Serialize)]
-struct VersionInfo {
-    version: String,
-    url: String,
+struct NaviExtension {
+    cached_binary_path: Option<String>,
 }
 
-#[import]
-fn command(string: &str) -> Option<Vec<u8>>;
+impl NaviExtension {
+    fn language_server_binary_path(&mut self, config: zed::LanguageServerConfig) -> Result<String> {
+        if let Some(path) = &self.cached_binary_path {
+            if fs::metadata(path).map_or(false, |stat| stat.is_file()) {
+                zed::set_language_server_installation_status(
+                    &config.name,
+                    &zed::LanguageServerInstallationStatus::Cached,
+                );
+                return Ok(path.clone());
+            }
+        }
 
-#[export]
-pub fn name() -> &'static str {
-    "navi"
-}
+        zed::set_language_server_installation_status(
+            &config.name,
+            &zed::LanguageServerInstallationStatus::CheckingForUpdate,
+        );
+        let release = zed::latest_github_release(
+            "navi-language/navi",
+            zed::GithubReleaseOptions {
+                require_assets: true,
+                pre_release: true,
+            },
+        )?;
 
-#[export]
-pub fn initialization_options() -> Option<String> {
-    Some("{ \"nightly\": true }".to_string())
-}
+        let (platform, arch) = zed::current_platform();
+        let asset_name = format!(
+            "navi-{version}-{arch}-{os}.tar.gz",
+            version = release.version,
+            arch = match arch {
+                zed::Architecture::Aarch64 => "arm64",
+                zed::Architecture::X86 => "amd64",
+                zed::Architecture::X8664 => "amd64",
+            },
+            os = match platform {
+                zed::Os::Mac => "darwin",
+                zed::Os::Linux => "linux",
+                zed::Os::Windows => "windows",
+            },
+        );
 
-#[export]
-pub fn language_ids() -> Vec<(String, String)> {
-    vec![("Navi".into(), "navi".into())]
-}
-
-#[export]
-pub fn server_args() -> Vec<String> {
-    vec![]
-}
-
-#[export]
-pub fn fetch_latest_server_version() -> Option<String> {
-    block_on(async {
-        let release = latest_github_release("navi-language/navi", true, true, http::client())
-            .await
-            .expect("error fetching latest release");
-
-        let arch = match ARCH {
-            "x86_64" => "amd64",
-            "aarch64" => "arm64",
-            _ => "amd64",
-        };
-
-        let asset_name = format!("navi-darwin-{}.tar.gz", arch);
         let asset = release
             .assets
             .iter()
             .find(|asset| asset.name == asset_name)
-            .ok_or_else(|| anyhow!("no asset found matching {:?}", asset_name))
-            .expect("error fetching asset");
+            .ok_or_else(|| format!("no asset found matching {:?}", asset_name))?;
 
-        let version_info = VersionInfo {
-            version: release.tag_name,
-            url: asset.browser_download_url.clone(),
-        };
+        let version_dir = format!("navi-{}", release.version);
+        let binary_path = format!("{version_dir}/{NAVI_SERVER_BIN_NAME}");
 
-        let version_info = serde_json::to_string(&version_info).log_err().unwrap();
+        if !fs::metadata(&binary_path).map_or(false, |stat| stat.is_file()) {
+            zed::set_language_server_installation_status(
+                &config.name,
+                &zed::LanguageServerInstallationStatus::Downloading,
+            );
 
-        Some(version_info)
-    })
-}
+            zed::download_file(
+                &asset.download_url,
+                &version_dir,
+                zed::DownloadedFileType::GzipTar,
+            )
+            .map_err(|e| format!("failed to download file: {e}"))?;
 
-#[export]
-pub fn fetch_server_binary(
-    container_dir: PathBuf,
-    version_info: String,
-) -> Result<PathBuf, String> {
-    let version_info = serde_json::from_str::<VersionInfo>(&version_info).unwrap();
-    let binary_path = container_dir.join(NAVI_SERVER_BIN_NAME);
-
-    block_on(async {
-        if fs::metadata(&binary_path).await.is_err() {
-            let mut response = http::client()
-                .get(&version_info.url, Default::default(), true)
-                .await
-                .context("error downloading release")
-                .log_err()
-                .unwrap();
-
-            let decompressed_bytes = GzipDecoder::new(BufReader::new(response.body_mut()));
-            let archive = Archive::new(decompressed_bytes);
-            archive.unpack(container_dir).await.log_err();
-        }
-
-        fs::set_permissions(
-            &binary_path,
-            <fs::Permissions as fs::unix::PermissionsExt>::from_mode(0o755),
-        )
-        .await
-        .log_err();
-    });
-
-    Ok(binary_path)
-}
-
-#[export]
-pub fn cached_server_binary(container_dir: PathBuf) -> Option<PathBuf> {
-    get_cached_server_binary(container_dir)
-}
-
-fn get_cached_server_binary(container_dir: PathBuf) -> Option<PathBuf> {
-    block_on(async {
-        async_maybe!({
-            let mut last_binary_path = None;
-            let mut entries = fs::read_dir(&container_dir).await?;
-            while let Some(entry) = entries.next().await {
-                let entry = entry?;
-                if entry.file_type().await?.is_file()
-                    && entry
-                        .file_name()
-                        .to_str()
-                        .map_or(false, |name| name == NAVI_SERVER_BIN_NAME)
-                {
-                    last_binary_path = Some(entry.path());
+            let entries =
+                fs::read_dir(".").map_err(|e| format!("failed to list working directory {e}"))?;
+            for entry in entries {
+                let entry = entry.map_err(|e| format!("failed to load directory entry {e}"))?;
+                if entry.file_name().to_str() != Some(&version_dir) {
+                    fs::remove_dir_all(&entry.path()).ok();
                 }
             }
 
-            if let Some(path) = last_binary_path {
-                Ok(path)
-            } else {
-                Err(anyhow!("no cached binary"))
-            }
-        })
-        .await
-        .log_err()
-    })
+            zed::set_language_server_installation_status(
+                &config.name,
+                &zed::LanguageServerInstallationStatus::Downloaded,
+            );
+        }
+
+        self.cached_binary_path = Some(binary_path.clone());
+        Ok(binary_path)
+    }
 }
+
+impl zed::Extension for NaviExtension {
+    fn new() -> Self {
+        Self {
+            cached_binary_path: None,
+        }
+    }
+
+    fn language_server_command(
+        &mut self,
+        config: zed::LanguageServerConfig,
+        _worktree: &zed::Worktree,
+    ) -> Result<zed::Command> {
+        Ok(zed::Command {
+            command: self.language_server_binary_path(config)?,
+            args: vec![],
+            env: Default::default(),
+        })
+    }
+}
+
+zed::register_extension!(NaviExtension);
