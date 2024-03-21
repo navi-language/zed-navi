@@ -14,6 +14,6 @@ language = "Navi"
 repository = "https://github.com/navi-language/tree-sitter-navi"
 commit = "14272e95fcd43501eeda1c58dff0428f8d5b66b0"
 
-[grammars.navi-stream]
+[grammars.navi_stream]
 repository = "https://github.com/navi-language/tree-sitter-navi-stream"
 commit = "67dd6ee7bdc612f2012215122d216bd7f094dc12"

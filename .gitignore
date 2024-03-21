@@ -1,4 +1,4 @@
 /target
 *.wasm
-grammars/navi-stream/
+grammars/navi_stream/
 grammars/navi/

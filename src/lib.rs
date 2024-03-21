@@ -1,6 +1,7 @@
 use std::fs;
 use zed_extension_api::{self as zed, Result};
 
+static GITHUB_REPO: &'static str = "navi-language/navi";
 static NAVI_SERVER_BIN_NAME: &'static str = "navi-lsp-server";
 
 struct NaviExtension {
@@ -24,7 +25,7 @@ impl NaviExtension {
             &zed::LanguageServerInstallationStatus::CheckingForUpdate,
         );
         let release = zed::latest_github_release(
-            "navi-language/navi",
+            GITHUB_REPO,
             zed::GithubReleaseOptions {
                 require_assets: true,
                 pre_release: true,
@@ -33,8 +34,7 @@ impl NaviExtension {
 
         let (platform, arch) = zed::current_platform();
         let asset_name = format!(
-            "navi-{version}-{arch}-{os}.tar.gz",
-            version = release.version,
+            "navi-{os}-{arch}.tar.gz",
             arch = match arch {
                 zed::Architecture::Aarch64 => "arm64",
                 zed::Architecture::X86 => "amd64",
