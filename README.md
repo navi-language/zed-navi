@@ -6,8 +6,8 @@ This extension provides language support for the [Navi](https://navi-lang.org).
 
 - Syntax highlighting.
 - Outline view.
-- LSP support [TODO].
-- Formatting [TODO].
+- LSP support.
+- Formatting.
 
 ## Languages
 
