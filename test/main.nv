@@ -1,10 +1,41 @@
 use std.io;
 
+#[serde(rename_all = "camelCase")]
 struct User {
     name: string,
+}
+
+struct MyError {
+    message: string,
 }
 
 fn main() {
     let user = User { name: "Jason Lee" };
     io.println("Hello, " + user.name);
+}
+
+fn create_user(name: string): User throws MyError {
+    if (name.len() == 0) {
+        throw MyError.new("name is empty");
+    }
+
+    return User { name: name };
+}
+
+impl MyError {
+    pub fn new(message: string): MyError {
+        return MyError { message: message };
+    }
+}
+
+impl Error for MyError {
+    pub fn error(self): string {
+        return self.message;
+    }
+}
+
+test "test_panic" {
+    if (1 == 2) {
+        panic "this is panic message";
+    }
 }

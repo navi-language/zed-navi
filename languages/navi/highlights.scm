@@ -126,6 +126,7 @@
   "interface"
   "let"
   "loop"
+  "panic"
   "pub"
   "return"
   "select"
@@ -146,7 +147,6 @@
 (use_list (self) @keyword)
 (scoped_use_list (self) @keyword)
 (scoped_identifier (self) @keyword)
-
 
 [
     (char_literal)
