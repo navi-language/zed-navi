@@ -1,6 +1,6 @@
 id = "navi"
 name = "Navi"
-description = "Navi language support for Zed"
+description = "Navi language support."
 version = "0.1.0"
 schema_version = 1
 authors = ["Jason Lee <huacnlee@gmail.com>"]
