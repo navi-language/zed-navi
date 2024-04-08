@@ -1,7 +1,7 @@
 name = "Navi Stream"
 grammar = "navi_stream"
 path_suffixes = ["nvs"]
-line_comments = ["// ", "/// "]
+line_comments = ["/// ", "// "]
 autoclose_before = ";:.,=}])>"
 brackets = [
     { start = "{", end = "}", close = true, newline = true },
