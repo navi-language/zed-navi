@@ -48,7 +48,7 @@
   function: (scoped_identifier
     "."
     name: (identifier) @function))
-(keyword_argument key: (identifier) @variable.parameter)
+(keyword_argument key: (identifier) @attribute)
 
 (generic_function
   function: (identifier) @function)
@@ -102,6 +102,7 @@
 (parameter (identifier) @variable.parameter)
 
 [
+  "alias"
   "as"
   "assert"
   "assert_eq"
@@ -124,6 +125,7 @@
   "impl"
   "in"
   "interface"
+  "is"
   "let"
   "loop"
   "panic"
@@ -143,7 +145,7 @@
   "while"
 ] @keyword
 
-(self) @variable.builtin
+(self) @variable.special
 (use_list (self) @keyword)
 (scoped_use_list (self) @keyword)
 (scoped_identifier (self) @keyword)
@@ -161,11 +163,13 @@
 
 [
     (bool_literal)
-    (integer_literal)
-    (float_literal)
     (nil_literal)
 ] @constant.builtin
 
+[
+    (integer_literal)
+    (float_literal)
+] @number
 
 (escape_sequence) @escape
 

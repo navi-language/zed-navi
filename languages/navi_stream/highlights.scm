@@ -43,7 +43,7 @@
     "."
     name: (identifier) @function))
 
-(keyword_argument key: (identifier) @variable.parameter)
+(keyword_argument key: (identifier) @attribute)
 
 (generic_function
   function: (identifier) @function)
@@ -99,8 +99,6 @@
 
 (parameter (identifier) @variable.parameter)
 
-(lifetime (identifier) @label)
-
 [
   "as"
   "assert"
@@ -149,19 +147,24 @@
 (scoped_use_list (self) @keyword)
 (scoped_identifier (self) @keyword)
 
-(self) @variable.builtin
+(self) @variable.special
 
-(char_literal) @string
-(string_literal) @string
-(raw_string_literal) @string
-(string_template) @string
+[
+    (char_literal)
+    (string_literal)
+    (raw_string_literal)
+    (string_template)
+] @string
 
-(color_literal) @color
+(color_literal) @constant.color
+
+[
+    (integer_literal)
+    (float_literal)
+] @number
 
 [
     (bool_literal)
-    (integer_literal)
-    (float_literal)
     (nil_literal)
 ] @constant.builtin
 
