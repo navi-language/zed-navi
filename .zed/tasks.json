@@ -1,0 +1,13 @@
+[
+  {
+    "type": "shell",
+    "command": "make",
+    "args": ["build"],
+    "group": {
+      "kind": "build",
+      "isDefault": true
+    },
+    "label": "build: Build Extension to Test",
+    "detail": "Build the extension and install it to Zed"
+  }
+]
