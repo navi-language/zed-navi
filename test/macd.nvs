@@ -1,0 +1,14 @@
+use ta, quote;
+
+let short = 12;
+let long = 26;
+let m = 9;
+
+let diff = ema(close, short) - ema(close, long);
+let dea = ema(diff, m);
+
+let message = `Hello ${diff}`;
+
+plot(diff, title: "diff", color: #ff8d1e);
+plot(dea, title: "dea", color: #0caee6);
+plot(2 * (diff - dea), style: plotstyle.line, color: #e970dc);

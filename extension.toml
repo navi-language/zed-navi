@@ -9,6 +9,11 @@ repository = "https://github.com/navi-language/zed-navi"
 [language_servers.navi]
 name = "Navi Language Server"
 language = "Navi"
+languages = ["Navi", "Navi Stream"]
+
+[language_servers.navi.language_ids]
+"Navi" = "navi"
+"Navi Stream" = "navi_stream"
 
 [grammars.navi]
 repository = "https://github.com/navi-language/tree-sitter-navi"
