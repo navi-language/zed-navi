@@ -1,4 +1,5 @@
 use std::fs;
+use zed::LanguageServerId;
 use zed_extension_api::{self as zed, Result};
 
 static GITHUB_REPO: &'static str = "navi-language/navi";
@@ -15,40 +16,37 @@ enum Status {
     Failed(String),
 }
 
-fn update_status(config: &zed::LanguageServerConfig, status: Status) {
+fn update_status(id: &zed::LanguageServerId, status: Status) {
     match status {
         Status::None => zed::set_language_server_installation_status(
-            &config.name,
+            id,
             &zed::LanguageServerInstallationStatus::None,
         ),
         Status::CheckingForUpdate => zed::set_language_server_installation_status(
-            &config.name,
+            id,
             &zed::LanguageServerInstallationStatus::CheckingForUpdate,
         ),
         Status::Downloading => zed::set_language_server_installation_status(
-            &config.name,
+            id,
             &zed::LanguageServerInstallationStatus::Downloading,
         ),
         Status::Failed(msg) => zed::set_language_server_installation_status(
-            &config.name,
+            id,
             &zed::LanguageServerInstallationStatus::Failed(msg),
         ),
     }
 }
 
 impl NaviExtension {
-    fn language_server_binary_path(
-        &mut self,
-        config: &zed::LanguageServerConfig,
-    ) -> Result<String> {
+    fn language_server_binary_path(&mut self, id: &zed::LanguageServerId) -> Result<String> {
         if let Some(path) = &self.cached_binary_path {
             if fs::metadata(path).map_or(false, |stat| stat.is_file()) {
-                update_status(&config, Status::None);
+                update_status(id, Status::None);
                 return Ok(path.clone());
             }
         }
 
-        update_status(&config, Status::CheckingForUpdate);
+        update_status(id, Status::CheckingForUpdate);
         let release = zed::latest_github_release(
             GITHUB_REPO,
             zed::GithubReleaseOptions {
@@ -82,7 +80,7 @@ impl NaviExtension {
         let binary_path = format!("{version_dir}/{NAVI_SERVER_BIN_NAME}");
 
         if !fs::metadata(&binary_path).map_or(false, |stat| stat.is_file()) {
-            update_status(&config, Status::Downloading);
+            update_status(id, Status::Downloading);
             zed::download_file(
                 &asset.download_url,
                 &version_dir,
@@ -99,7 +97,7 @@ impl NaviExtension {
                 }
             }
 
-            update_status(&config, Status::None);
+            update_status(id, Status::None);
         }
 
         self.cached_binary_path = Some(binary_path.clone());
@@ -116,11 +114,11 @@ impl zed::Extension for NaviExtension {
 
     fn language_server_command(
         &mut self,
-        config: zed::LanguageServerConfig,
+        id: &zed::LanguageServerId,
         _worktree: &zed::Worktree,
     ) -> Result<zed::Command> {
-        let command = self.language_server_binary_path(&config).map_err(|err| {
-            update_status(&config, Status::Failed(err.to_string()));
+        let command = self.language_server_binary_path(id).map_err(|err| {
+            update_status(id, Status::Failed(err.to_string()));
             err
         })?;
 
