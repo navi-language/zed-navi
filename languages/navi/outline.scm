@@ -41,11 +41,6 @@
     "type" @context
     name: (_) @name) @item
 
-(const_item
-    (visibility_modifier)? @context
-    "const" @context
-    name: (_) @name) @item
-
 (test_item
     "test" @context
     name: (_) @name) @item

@@ -1,4 +1,5 @@
 use std.io;
+
 use macd;
 
 #[serde(rename_all = "camelCase")]
@@ -38,5 +39,7 @@ impl Error for MyError {
 test "test_panic" {
     if (1 == 2) {
         panic "this is panic message";
+    }
+}
     }
 }
