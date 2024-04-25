@@ -3,17 +3,9 @@
     "struct" @context
     name: (_) @name) @item
 
-(field_declaration
-    (visibility_modifier)? @context
-    name: (_) @name) @item
-
 (enum_item
     (visibility_modifier)? @context
     "enum" @context
-    name: (_) @name) @item
-
-(enum_variant
-    (visibility_modifier)? @context
     name: (_) @name) @item
 
 (impl_item

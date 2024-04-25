@@ -13,6 +13,8 @@ struct MyError {
 
 fn main() {
     let user = User { name: "Jason Lee" };
+    const user1 = "";
+
     io.println("Hello, " + user.name);
 }
 
@@ -39,7 +41,5 @@ impl Error for MyError {
 test "test_panic" {
     if (1 == 2) {
         panic "this is panic message";
-    }
-}
     }
 }
