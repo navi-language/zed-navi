@@ -1,5 +1,4 @@
 use std::fs;
-use zed::LanguageServerId;
 use zed_extension_api::{self as zed, Result};
 
 static GITHUB_REPO: &'static str = "navi-language/navi";
@@ -57,7 +56,7 @@ impl NaviExtension {
 
         let (platform, arch) = zed::current_platform();
         let asset_name = format!(
-            "navi-{os}-{arch}.tar.gz",
+            "navi-{os}-{arch}.{ext}",
             arch = match arch {
                 zed::Architecture::Aarch64 => "arm64",
                 zed::Architecture::X86 => "amd64",
@@ -68,7 +67,16 @@ impl NaviExtension {
                 zed::Os::Linux => "linux",
                 zed::Os::Windows => "windows",
             },
+            ext = match platform {
+                zed::Os::Windows => "zip",
+                _ => "tar.gz",
+            }
         );
+
+        let file_type = match platform {
+            zed::Os::Windows => zed::DownloadedFileType::Zip,
+            _ => zed::DownloadedFileType::GzipTar,
+        };
 
         let asset = release
             .assets
@@ -81,12 +89,8 @@ impl NaviExtension {
 
         if !fs::metadata(&binary_path).map_or(false, |stat| stat.is_file()) {
             update_status(id, Status::Downloading);
-            zed::download_file(
-                &asset.download_url,
-                &version_dir,
-                zed::DownloadedFileType::GzipTar,
-            )
-            .map_err(|e| format!("failed to download file: {e}"))?;
+            zed::download_file(&asset.download_url, &version_dir, file_type)
+                .map_err(|e| format!("failed to download file: {e}"))?;
 
             let entries =
                 fs::read_dir(".").map_err(|e| format!("failed to list working directory {e}"))?;
