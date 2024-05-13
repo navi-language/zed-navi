@@ -1,14 +1,32 @@
 [
   {
-    "label": "navi test (case)",
+    "label": "navi test (item)",
     "command": "navi",
-    "args": ["test", "$ZED_FILE", "$ZED_SYMBOL"],
+    "args": ["test", "$ZED_FILE:$ZED_ROW"],
     "tags": ["navi-test"]
   },
   {
     "label": "navi test (file)",
     "command": "navi",
     "args": ["test", "$ZED_FILE"],
-    "tags": ["navi-test", "navi-test-file"]
+    "tags": ["navi-file"]
+  },
+  {
+    "label": "navi bench (item)",
+    "command": "navi",
+    "args": ["bench", "$ZED_FILE:$ZED_ROW"],
+    "tags": ["navi-bench"]
+  },
+  {
+    "label": "navi bench (file)",
+    "command": "navi",
+    "args": ["bench", "$ZED_FILE"],
+    "tags": ["navi-file"]
+  },
+  {
+    "label": "navi run",
+    "command": "navi",
+    "args": ["run", "$ZED_FILE"],
+    "tags": ["navi-run"]
   }
 ]
