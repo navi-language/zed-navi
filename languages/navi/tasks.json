@@ -1,0 +1,14 @@
+[
+  {
+    "label": "navi test (case)",
+    "command": "navi",
+    "args": ["test", "$ZED_FILE", "$ZED_SYMBOL"],
+    "tags": ["navi-test"]
+  },
+  {
+    "label": "navi test (file)",
+    "command": "navi",
+    "args": ["test", "$ZED_FILE"],
+    "tags": ["navi-test", "navi-test-file"]
+  }
+]
