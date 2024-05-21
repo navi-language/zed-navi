@@ -37,15 +37,31 @@ fn update_status(id: &zed::LanguageServerId, status: Status) {
 }
 
 impl NaviExtension {
-    fn language_server_binary_path(&mut self, id: &zed::LanguageServerId) -> Result<String> {
+    fn language_server_binary_path(
+        &mut self,
+        id: &zed::LanguageServerId,
+        worktree: &zed::Worktree,
+    ) -> Result<String> {
+        // Check if the binary is already installed by manually checking the path
+        if let Some(path) = worktree.which(NAVI_SERVER_BIN_NAME) {
+            return Ok(path);
+        }
+
         if let Some(path) = &self.cached_binary_path {
             if fs::metadata(path).map_or(false, |stat| stat.is_file()) {
                 update_status(id, Status::None);
                 return Ok(path.clone());
             }
         }
+        let (platform, arch) = zed::current_platform();
+
+        if fs::metadata(NAVI_SERVER_BIN_NAME).map_or(false, |stat| stat.is_file()) {
+            update_status(id, Status::None);
+            return Ok(NAVI_SERVER_BIN_NAME.to_string());
+        }
 
         update_status(id, Status::CheckingForUpdate);
+
         let release = zed::latest_github_release(
             GITHUB_REPO,
             zed::GithubReleaseOptions {
@@ -54,7 +70,6 @@ impl NaviExtension {
             },
         )?;
 
-        let (platform, arch) = zed::current_platform();
         let asset_name = format!(
             "navi-{os}-{arch}.{ext}",
             arch = match arch {
@@ -119,12 +134,14 @@ impl zed::Extension for NaviExtension {
     fn language_server_command(
         &mut self,
         id: &zed::LanguageServerId,
-        _worktree: &zed::Worktree,
+        worktree: &zed::Worktree,
     ) -> Result<zed::Command> {
-        let command = self.language_server_binary_path(id).map_err(|err| {
-            update_status(id, Status::Failed(err.to_string()));
-            err
-        })?;
+        let command = self
+            .language_server_binary_path(id, worktree)
+            .map_err(|err| {
+                update_status(id, Status::Failed(err.to_string()));
+                err
+            })?;
 
         Ok(zed::Command {
             command,

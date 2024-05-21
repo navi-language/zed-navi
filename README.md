@@ -2,6 +2,13 @@
 
 This extension provides language support for the [Navi](https://navi-lang.org).
 
+## Usage
+
+Extension will try to use the Navi that is installed on your system.
+
+1. If the `navi-lsp-server` is in your PATH, it will use that, try `which navi-lsp-server` to see if it is in your PATH.
+2. Otherwice, the extension will download Navi automatically and installed into Zed's work directory.
+
 ## Features
 
 - Syntax highlighting.
