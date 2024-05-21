@@ -1,7 +1,7 @@
 id = "navi"
 name = "Navi"
 description = "Navi language support."
-version = "0.3.0"
+version = "0.4.0"
 schema_version = 1
 authors = ["Jason Lee <huacnlee@gmail.com>"]
 repository = "https://github.com/navi-language/zed-navi"
