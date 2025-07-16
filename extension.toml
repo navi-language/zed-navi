@@ -20,4 +20,4 @@ commit = "af94aa5b50303f1fbc53349b97c6817f89e6e85c"
 
 [grammars.navi_stream]
 repository = "https://github.com/navi-language/tree-sitter-navi-stream"
-commit = "4ff2d8514434fb6bd6dc1f6bcd673a259705927b"
+commit = "32c1a9139bf4256e922e8a50edddf7a195be21d8"
