@@ -1,0 +1,15 @@
+{
+  "grammars": [
+    {
+      "name": "navi_05",
+      "scope": "source.navi",
+      "path": ".",
+      "file-types": ["nv"]
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "Tree-sitter grammar for Navi 0.5"
+  }
+}
