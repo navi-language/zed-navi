@@ -1,6 +1,6 @@
-name = "Navi"
+name = "Navi Legacy"
 grammar = "navi"
-path_suffixes = ["nv", "navi"]
+path_suffixes = ["navi"]
 line_comments = ["/// ", "// "]
 autoclose_before = ";:.,=}])>"
 brackets = [

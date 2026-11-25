@@ -4,31 +4,29 @@
 
 This extension provides language support for the [Navi](https://navi-lang.org).
 
-## Usage
+## Navi 0.5
 
-Extension will try to use the Navi that is installed on your system.
+Open a `.nv` script to get syntax highlighting, document outline, diagnostics,
+completion, hover, go-to-definition, and formatting. Zed uses `navi-lsp` if it
+finds it on PATH. Otherwise, it downloads Longbridge's official WebAssembly
+language server and runs it with Zed's Node.js runtime.
 
-1. If the `navi-lsp-server` is in your PATH, it will use that, try `which navi-lsp-server` to see if it is in your PATH.
-2. Otherwice, the extension will download Navi automatically and installed into Zed's work directory.
+Install the [Navi CLI](https://navi-lang.org/docs/install) if you want to use the
+`navi check` task. The language server works without the CLI.
 
-## Features
+## Legacy projects
 
-- Syntax highlighting.
-- Outline view.
-- LSP support.
-- Formatting.
-- Code actions.
+`.navi` files open as **Navi Legacy** and `.nvs` files open as **Navi Stream**.
+They use the original grammars and `navi-lsp-server`. Older projects that use
+`.nv` can associate it with **Navi Legacy** in their Zed project settings:
 
-## Languages
-
-- Navi (.nv, .navi)
-- Navi Stream (.nvs)
-
-## Screenshot
-
-<img width="1058" alt="image" src="https://github.com/navi-language/zed-navi/assets/5518/cb98c2bf-f6f7-4f98-94c4-014c1fd164b2">
-
-<img width="1110" alt="image" src="https://github.com/navi-language/zed-navi/assets/5518/5fda451e-e930-4da2-b4d7-ee8bd873d9ad">
+```json
+{
+  "file_types": {
+    "Navi Legacy": ["nv"]
+  }
+}
+```
 
 ## License
 

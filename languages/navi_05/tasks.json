@@ -1,0 +1,8 @@
+[
+    {
+        "label": "navi check",
+        "command": "navi",
+        "args": ["check", "$ZED_FILE"],
+        "tags": ["navi-check"]
+    }
+]
