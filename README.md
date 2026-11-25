@@ -6,10 +6,13 @@ This extension provides language support for the [Navi](https://navi-lang.org).
 
 ## Usage
 
-Extension will try to use the Navi that is installed on your system.
+For Navi 0.5 scripts, Zed uses `navi-lsp` from PATH when available. Otherwise,
+it downloads the official [Navi language server](https://navi-lang.org/docs/install)
+and runs its WebAssembly backend with Zed's Node.js runtime.
 
-1. If the `navi-lsp-server` is in your PATH, it will use that, try `which navi-lsp-server` to see if it is in your PATH.
-2. Otherwice, the extension will download Navi automatically and installed into Zed's work directory.
+Legacy Navi and Navi Stream use `navi-lsp-server` from PATH or download it automatically.
+For older projects that use `.nv`, add `"file_types": {"Navi": ["nv"]}` to the
+Zed project settings.
 
 ## Features
 
@@ -21,7 +24,8 @@ Extension will try to use the Navi that is installed on your system.
 
 ## Languages
 
-- Navi (.nv, .navi)
+- Navi 0.5 (.nv)
+- Navi (.navi)
 - Navi Stream (.nvs)
 
 ## Screenshot

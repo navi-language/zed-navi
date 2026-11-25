@@ -1,8 +1,16 @@
-use std::fs;
+use std::{env, fs, path::Path};
 use zed_extension_api::{self as zed, Result};
 
 static GITHUB_REPO: &'static str = "navi-language/navi";
 static NAVI_SERVER_BIN_NAME: &'static str = "navi-lsp-server";
+
+const NAVI_LSP_VSIX: &str = "https://raw.githubusercontent.com/longbridge/navi/9fa1c19fc444247f3e893c0d515c653b952fcea6/public/navi-vscode.vsix";
+const NAVI_LSP_DIR: &str = "navi-lsp-0.5.0-9fa1c19";
+const NAVI_LSP_ENTRYPOINT: &str = "extension/dist/server.node.js";
+const NAVI_LSP_MODULES: [&str; 2] = [
+    "extension/wasm-lsp/navi_lsp_wasm_bg.wasm",
+    "extension/wasm-formatter/navi_formatter_wasm_bg.wasm",
+];
 
 struct NaviExtension {
     cached_binary_path: Option<String>,
@@ -34,6 +42,64 @@ fn update_status(id: &zed::LanguageServerId, status: Status) {
             &zed::LanguageServerInstallationStatus::Failed(msg),
         ),
     }
+}
+
+fn navi_05_server_command(
+    id: &zed::LanguageServerId,
+    worktree: &zed::Worktree,
+) -> Result<zed::Command> {
+    let native_binary = match zed::current_platform().0 {
+        zed::Os::Windows => "navi-lsp.exe",
+        _ => "navi-lsp",
+    };
+    if let Some(command) = worktree.which(native_binary) {
+        return Ok(zed::Command {
+            command,
+            args: vec![],
+            env: Default::default(),
+        });
+    }
+
+    let node = zed::node_binary_path()?;
+    let directory = Path::new(NAVI_LSP_DIR);
+    let server = directory.join(NAVI_LSP_ENTRYPOINT);
+    if !navi_05_installation_is_complete(directory) {
+        update_status(id, Status::Downloading);
+        let staging = format!("{NAVI_LSP_DIR}-staging");
+        let staging_path = Path::new(&staging);
+        for path in [staging_path, directory] {
+            if path.is_dir() {
+                fs::remove_dir_all(path)
+                    .map_err(|err| format!("failed to clear Navi LSP download: {err}"))?;
+            }
+        }
+        zed::download_file(NAVI_LSP_VSIX, &staging, zed::DownloadedFileType::Zip).map_err(
+            |err| format!("failed to download the official Navi language server: {err}"),
+        )?;
+        if !navi_05_installation_is_complete(staging_path) {
+            return Err(
+                "the Navi archive is missing the language server or its WebAssembly modules".into(),
+            );
+        }
+        fs::rename(staging_path, directory)
+            .map_err(|err| format!("failed to install the Navi language server: {err}"))?;
+    }
+    let server = env::current_dir()
+        .map_err(|err| format!("failed to locate the Navi extension work directory: {err}"))?
+        .join(server);
+
+    Ok(zed::Command {
+        command: node,
+        args: vec![server.to_string_lossy().into_owned(), "--stdio".into()],
+        env: Default::default(),
+    })
+}
+
+fn navi_05_installation_is_complete(directory: &Path) -> bool {
+    directory.join(NAVI_LSP_ENTRYPOINT).is_file()
+        && NAVI_LSP_MODULES
+            .iter()
+            .all(|path| directory.join(path).is_file())
 }
 
 impl NaviExtension {
@@ -111,7 +177,9 @@ impl NaviExtension {
                 fs::read_dir(".").map_err(|e| format!("failed to list working directory {e}"))?;
             for entry in entries {
                 let entry = entry.map_err(|e| format!("failed to load directory entry {e}"))?;
-                if entry.file_name().to_str() != Some(&version_dir) {
+                if entry.file_name().to_str() != Some(&version_dir)
+                    && !entry.file_name().to_string_lossy().starts_with("navi-lsp-")
+                {
                     fs::remove_dir_all(&entry.path()).ok();
                 }
             }
@@ -136,6 +204,15 @@ impl zed::Extension for NaviExtension {
         id: &zed::LanguageServerId,
         worktree: &zed::Worktree,
     ) -> Result<zed::Command> {
+        if id.as_ref() == "navi_05" {
+            let result = navi_05_server_command(id, worktree);
+            match &result {
+                Ok(_) => update_status(id, Status::None),
+                Err(err) => update_status(id, Status::Failed(err.to_string())),
+            }
+            return result;
+        }
+
         let command = self
             .language_server_binary_path(id, worktree)
             .map_err(|err| {
